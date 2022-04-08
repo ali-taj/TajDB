@@ -1,7 +1,7 @@
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urls import valid_urls
-import socketserver
+# import socketserver
 
 hostName = "0.0.0.0"
 serverPort = 8080
@@ -82,13 +82,8 @@ class MyServer(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    with socketserver.TCPServer((hostName, serverPort), MyServer) as server:
-        # Activate the server; this will keep running until you
-        # interrupt the program with Ctrl-C
-        print("Server started http://%s:%s" % (hostName, serverPort))
-        server.serve_forever()
-
-    # webServer = HTTPServer((hostName, serverPort), MyServer)
+    webServer = HTTPServer((hostName, serverPort), MyServer)
+    print("Server started http://%s:%s" % (hostName, serverPort))
 
     # webServer.socket = ssl.wrap_socket(
     #     webServer.socket,
@@ -96,7 +91,7 @@ if __name__ == "__main__":
     #     certfile='path/to/cert.pem',
     #     server_side=True)
 
-    # try:
-    #     webServer.serve_forever()
-    # except:
-    #     pass
+    try:
+        webServer.serve_forever()
+    except:
+        pass
