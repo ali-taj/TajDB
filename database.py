@@ -1,6 +1,6 @@
 import json
 
-databases_location = 'databases\\'
+databases_location = 'databases/'
 
 
 class Selector:
