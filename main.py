@@ -3,7 +3,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from urls import valid_urls
 # import socketserver
 
-hostName = "0.0.0.0"
+hostName = "127.0.0.1"
 serverPort = 8080
 
 
@@ -73,8 +73,6 @@ class MyServer(BaseHTTPRequestHandler):
                     request.wfile.write(json.dumps(response).encode(encoding='utf_8'))
 
     def do_GET(self):
-        print(8, self.server.socket)
-        print(9, self.client_address)
         self.main(self)
 
     def do_POST(self):

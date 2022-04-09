@@ -4,7 +4,7 @@ import random
 import string
 from datetime import datetime
 
-from database import Selector, databases_location
+from database import databases_location, CustomersDB
 
 
 def id_generator(size=18, chars=string.ascii_uppercase + string.digits):
@@ -27,34 +27,31 @@ class Home:
 
 
 class Customers:
-    def get(self, request):
 
+    def get(self, request):
         male_count = 0
-        for data in Selector._json(Selector, "customers"):
+        customer_list = CustomersDB.list(CustomersDB)
+        for data in customer_list:
             if "gender" in data:
                 if data["gender"] == "Male":
                     male_count += 1
-        r = {"gender Male Count": male_count, "all_count": len(Selector._json(Selector, "customers"))}
-        return {"response": r, "status": 200}
+        response = {"gender Male Count": male_count, "all_count": len(customer_list)}
+        return {"response": response, "status": 200}
 
     def create(self, request):
         if request.headers['Content-Type'] == "application/json":
             data_string = request.rfile.read(int(request.headers['Content-Length']))
             request_data = json.loads(data_string)
             prepared_data_for_save = config_data(data_storage="customers", data=request_data)
-            DB_data = json.loads(open(f"{databases_location}customers.json", 'r').read())
-            DB_data.append(prepared_data_for_save)
-            DB_file = open(f"{databases_location}customers.json", 'w')
-            DB_file.write(json.dumps(DB_data))
-            DB_file.close()
-
-            return {"response": prepared_data_for_save, "status": 201}
+            response = CustomersDB.append(CustomersDB, data=prepared_data_for_save)
+            return {"response": response, "status": 201}
         else:
             response = {"error": f"Content-Type {request.headers['Content-Type']} not allowed!"}
             return {"response": response, "status": 400}
 
     def list(self, request):
-        return {"response": Selector._json(Selector, "customers"), "status": 200}
+        return {"response": CustomersDB.list(CustomersDB), "status": 200}
+
 
 
 class DataBase:
