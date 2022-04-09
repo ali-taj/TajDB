@@ -1,7 +1,12 @@
 import json
+import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from os import curdir, sep
+from mimetypes import types_map
+
 from urls import valid_urls
 # import socketserver
+import codecs
 
 hostName = "127.0.0.1"
 serverPort = 8080
@@ -93,3 +98,33 @@ if __name__ == "__main__":
         webServer.serve_forever()
     except:
         pass
+
+
+# return html sample
+#         try:
+#             fname, ext = os.path.splitext(self.path)
+#             if ext in (".html",):
+#                 # with open(curdir + sep + "site" + self.path, 'rb') as f:
+#                 html_file = open("site/" + self.path, "r", encoding="utf-8").read()
+#                 self.send_response(200)
+#                 self.send_header('Content-type', types_map[ext])
+#                 self.end_headers()
+#                 self.wfile.write(html_file.format("ali").encode("utf-8"))
+#
+#             elif ext in (".css", ".js", ".jpg", ".svg", ".png", "jpeg"):
+#                 with open(curdir + sep + "site" + self.path, 'rb') as f:
+#                     self.send_response(200)
+#                     self.send_header('Content-type', types_map[ext])
+#                     self.end_headers()
+#                     self.wfile.write(f.read())
+#             elif ext in (".woff", ".ttf", ".eot"):
+#                 fonts_mime_types = {".woff": "font/woff", ".ttf": "application/octet-stream",
+#                                     ".eot": "application/vnd.ms-fontobject"}
+#                 with open(curdir + sep + "site" + self.path, 'rb') as f:
+#                     self.send_response(200)
+#                     self.send_header('Content-type', fonts_mime_types[ext])
+#                     self.end_headers()
+#                     self.wfile.write(f.read())
+#             return
+#         except IOError:
+#             self.send_error(404)
