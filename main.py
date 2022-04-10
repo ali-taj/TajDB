@@ -42,7 +42,7 @@ class MyServer(BaseHTTPRequestHandler):
             request._set_headers(404)
             request.wfile.write(json.dumps(response).encode(encoding='utf_8'))
         else:
-            class_name = valid_urls[url]
+            class_name = valid_urls[url]()
             class_function = url_path.split("/")[2] if len(url_path.split("/")) > 2 else None
             data_id = url_path.split("/")[3] if len(url_path.split("/")) > 3 else None
             inefficient_data = url_path.split("/")[4] if len(url_path.split("/")) > 4 else None
@@ -51,31 +51,31 @@ class MyServer(BaseHTTPRequestHandler):
                 request._set_headers(400)
                 request.wfile.write(json.dumps(response).encode(encoding='utf_8'))
             else:
-                try:
-                    if class_function is not None:
-                        call_able_function = eval("class_name." + class_function)
+                # try:
+                if class_function is not None:
+                    call_able_function = eval("class_name." + class_function)
 
-                    else:
-                        call_able_function = eval("class_name")
+                else:
+                    call_able_function = eval("class_name")()
 
-                    if query_dictionary != {}:
-                        request["query"] = query_dictionary
+                if query_dictionary != {}:
+                    request["query"] = query_dictionary
 
-                    if data_id is not None and data_id != "":
-                        api_response = call_able_function(class_name, request=request, id=data_id)
-                    else:
-                        api_response = call_able_function(class_name, request=request)
+                if data_id is not None and data_id != "":
+                    api_response = call_able_function(request=request, id=data_id)
+                else:
+                    api_response = call_able_function(request=request)
 
-                    request._set_headers(api_response["status"])
-                    request.wfile.write(json.dumps(api_response["response"]).encode(encoding='utf_8'))
-                except AttributeError as e:
-                    response = {"BAD_REQUEST": f"{class_function} is not allowed in {class_name}."}
-                    request._set_headers(400)
-                    request.wfile.write(json.dumps(response).encode(encoding='utf_8'))
-                except Exception as e:
-                    response = {"BAD_REQUEST": str(e)}
-                    request._set_headers(400)
-                    request.wfile.write(json.dumps(response).encode(encoding='utf_8'))
+                request._set_headers(api_response["status"])
+                request.wfile.write(json.dumps(api_response["response"]).encode(encoding='utf_8'))
+                # except AttributeError as e:
+                #     response = {"BAD_REQUEST": f"{class_function} is not allowed in {class_name}."}
+                #     request._set_headers(400)
+                #     request.wfile.write(json.dumps(response).encode(encoding='utf_8'))
+                # except Exception as e:
+                #     response = {"BAD_REQUEST": str(e)}
+                #     request._set_headers(400)
+                #     request.wfile.write(json.dumps(response).encode(encoding='utf_8'))
 
     def do_GET(self):
         self.main(self)
@@ -98,7 +98,6 @@ if __name__ == "__main__":
         webServer.serve_forever()
     except:
         pass
-
 
 # return html sample
 #         try:

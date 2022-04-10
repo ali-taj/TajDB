@@ -1,0 +1,12 @@
+[
+    {"name": "admin"},
+    {"name": "user",
+     "urls": {
+         "login": {
+             "GET": "all",
+             "POST": {
+                 "user.name": "Ali"
+             }
+         }
+     }}
+]
