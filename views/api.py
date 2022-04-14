@@ -1,6 +1,10 @@
+import base64
 import json
 import os
 from datetime import datetime
+from time import sleep
+
+import requests
 
 from helper import DataBaseCTRL, databases_location, config_data
 
@@ -88,3 +92,38 @@ class DataBase:
             response.append(json_data)
 
         return {"response": response, "status": 200}
+
+
+class Products:
+
+    def __init__(self):
+        self.products_db = DataBaseCTRL('products')
+        self.dk_products_db = DataBaseCTRL('dk_products')
+
+    def get(self, request):
+
+        active_count = 0
+        product_list = self.products_db.list()
+        for data in product_list:
+            if "status" in data:
+                if data["status"] == "marketable":
+                    active_count += 1
+        response = {"gender Male Count": active_count, "all_count": len(product_list )}
+        return {"response": response, "status": 200}
+
+    def get_dg_product(self, request):
+        for i in range(109204, 9000000):
+            print(i)
+            url = f"https://api.digikala.com/v1/product/{i}/"
+            url_request = requests.get(url).json()
+            if "data" in url_request:
+                product_data = url_request["data"]["product"]
+                if "is_inactive" not in product_data and product_data["status"] == "marketable":
+                    dk_base64_url = base64.b64encode(bytes(f'https://www.digikala.com/product/dkp-{i}', 'utf-8'))
+                    main_affiliate_url = "https://affstat.adro.co/click/1eea7fa4-ee12-435b-958c-e4727a721a7e/"
+                    data_for_save = {"id": product_data["id"],
+                                     "dk_url": "https://www.digikala.com{}".format(product_data["url"]["uri"]),
+                                     "affilator_url": f"{main_affiliate_url}{dk_base64_url}"}
+                    prepared_data_for_save = config_data(data_storage="dk_products", data=data_for_save)
+                    self.dk_products_db.append(data=prepared_data_for_save)
+        return {"response": f"{i} products created!", "status": 201}
