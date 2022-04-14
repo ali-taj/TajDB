@@ -3,13 +3,14 @@ import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from os import curdir, sep
 from mimetypes import types_map
+from time import sleep
 
 from urls import valid_urls
 # import socketserver
 import codecs
 
 hostName = "127.0.0.1"
-serverPort = 8080
+serverPort = 8081
 
 
 class MyServer(BaseHTTPRequestHandler):
@@ -68,6 +69,7 @@ class MyServer(BaseHTTPRequestHandler):
 
                 request._set_headers(api_response["status"])
                 request.wfile.write(json.dumps(api_response["response"]).encode(encoding='utf_8'))
+
                 # except AttributeError as e:
                 #     response = {"BAD_REQUEST": f"{class_function} is not allowed in {class_name}."}
                 #     request._set_headers(400)
