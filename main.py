@@ -10,7 +10,7 @@ from urls import valid_urls
 import codecs
 
 hostName = "127.0.0.1"
-serverPort = 8081
+serverPort = 8080
 
 
 class MyServer(BaseHTTPRequestHandler):
