@@ -14,7 +14,7 @@ def config_data(**kwargs):
     return data
 
 
-class DataBaseCTRL():
+class DataBaseCTRL:
     def __init__(self, db_name):
         self.name = db_name
         self.location = databases_location + self.name + ".json"

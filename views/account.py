@@ -8,7 +8,7 @@ class User:
     def __init__(self):
         self.users_db = DataBaseCTRL('users')
 
-    def signup(self, request):
+    def signup(self, request, auth):
         if request.headers['Content-Type'] == "application/json":
             data_string = request.rfile.read(int(request.headers['Content-Length']))
             request_data = json.loads(data_string)
@@ -40,7 +40,7 @@ class User:
             response = {"error": f"Content-Type {request.headers['Content-Type']} not allowed!"}
             return {"response": response, "status": 400}
 
-    def get(self, request):
+    def get(self, request, auth):
         male_count = 0
         customer_list = self.users_db.list()
         for data in customer_list:
@@ -50,7 +50,7 @@ class User:
         response = {"gender Male Count": male_count, "all_count": len(customer_list)}
         return {"response": response, "status": 200}
 
-    def create(self, request):
+    def create(self, request, auth):
         if request.headers['Content-Type'] == "application/json":
             data_string = request.rfile.read(int(request.headers['Content-Length']))
             request_data = json.loads(data_string)
@@ -61,7 +61,7 @@ class User:
             response = {"error": f"Content-Type {request.headers['Content-Type']} not allowed!"}
             return {"response": response, "status": 400}
 
-    def update(self, request, id):
+    def update(self, request, id, auth):
         if request.headers['Content-Type'] == "application/json":
             data_string = request.rfile.read(int(request.headers['Content-Length']))
             request_data = json.loads(data_string)
@@ -71,9 +71,9 @@ class User:
             response = {"error": f"Content-Type {request.headers['Content-Type']} not allowed!"}
             return {"response": response, "status": 400}
 
-    def delete(self, request, id):
+    def delete(self, request, id, auth):
         response = self.users_db.remove(id)
         return {"response": response, "status": 200}
 
-    def list(self, request):
+    def list(self, request, auth):
         return {"response": self.users_db.list(), "status": 200}

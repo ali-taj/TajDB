@@ -9,6 +9,8 @@ from urls import valid_urls
 # import socketserver
 import codecs
 
+from views.base import authentication
+
 hostName = "127.0.0.1"
 serverPort = 8080
 
@@ -52,23 +54,30 @@ class MyServer(BaseHTTPRequestHandler):
                 request._set_headers(400)
                 request.wfile.write(json.dumps(response).encode(encoding='utf_8'))
             else:
-                # try:
-                if class_function is not None:
-                    call_able_function = eval("class_name." + class_function)
-
+                # authentication must be here (authCode , class_name, class_function, data_id)
+                auth_code = self.headers.getheader('Authorization')
+                auth_result = authentication(auth_code, class_name, class_function, data_id)
+                if auth_result == 403:
+                    request._set_headers(403)
+                    request.wfile.write(json.dumps(auth_result).encode(encoding='utf_8'))
                 else:
-                    call_able_function = eval("class_name")()
+                    # try:
+                    if class_function is not None:
+                        call_able_function = eval("class_name." + class_function)
 
-                if query_dictionary != {}:
-                    request["query"] = query_dictionary
+                    else:
+                        call_able_function = eval("class_name")()
 
-                if data_id is not None and data_id != "":
-                    api_response = call_able_function(request=request, id=data_id)
-                else:
-                    api_response = call_able_function(request=request)
+                    if query_dictionary != {}:
+                        request["query"] = query_dictionary
 
-                request._set_headers(api_response["status"])
-                request.wfile.write(json.dumps(api_response["response"]).encode(encoding='utf_8'))
+                    if data_id is not None and data_id != "":
+                        api_response = call_able_function(request=request, id=data_id, auth=auth_result)
+                    else:
+                        api_response = call_able_function(request=request, auth=auth_result)
+
+                    request._set_headers(api_response["status"])
+                    request.wfile.write(json.dumps(api_response["response"]).encode(encoding='utf_8'))
 
                 # except AttributeError as e:
                 #     response = {"BAD_REQUEST": f"{class_function} is not allowed in {class_name}."}

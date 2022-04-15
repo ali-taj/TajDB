@@ -9,21 +9,11 @@ import requests
 from helper import DataBaseCTRL, databases_location, config_data
 
 
-class Home:
-
-    def search(self, request):
-        data_string = request.rfile.read(
-            int(request.headers['Content-Length'])) if "Content-Length" in request.headers else ""
-        url = request.path
-
-        return {"response": {"url": url, "data": data_string}, "status": 200}
-
-
 class Customers:
     def __init__(self):
         self.customer_db = DataBaseCTRL('customers')
 
-    def get(self, request):
+    def get(self, request, auth):
 
         male_count = 0
         customer_list = self.customer_db.list()
@@ -34,7 +24,7 @@ class Customers:
         response = {"gender Male Count": male_count, "all_count": len(customer_list)}
         return {"response": response, "status": 200}
 
-    def create(self, request):
+    def create(self, request, auth):
         if request.headers['Content-Type'] == "application/json":
             data_string = request.rfile.read(int(request.headers['Content-Length']))
             request_data = json.loads(data_string)
@@ -45,7 +35,7 @@ class Customers:
             response = {"error": f"Content-Type {request.headers['Content-Type']} not allowed!"}
             return {"response": response, "status": 400}
 
-    def update(self, request, id):
+    def update(self, request, id, auth):
         if request.headers['Content-Type'] == "application/json":
             data_string = request.rfile.read(int(request.headers['Content-Length']))
             request_data = json.loads(data_string)
@@ -55,7 +45,7 @@ class Customers:
             response = {"error": f"Content-Type {request.headers['Content-Type']} not allowed!"}
             return {"response": response, "status": 400}
 
-    def delete(self, request, id):
+    def delete(self, request, id, auth):
         response = self.customer_db.remove(id)
         return {"response": response, "status": 200}
 
@@ -64,7 +54,7 @@ class Customers:
 
 
 class DataBase:
-    def size(self, request):
+    def size(self, request, auth):
         arr = os.listdir(os.path.dirname(databases_location))
         response = []
         for db in arr:
@@ -100,7 +90,7 @@ class Products:
         self.products_db = DataBaseCTRL('products')
         self.dk_products_db = DataBaseCTRL('dk_products')
 
-    def get(self, request):
+    def get(self, request, auth):
 
         active_count = 0
         product_list = self.products_db.list()
@@ -111,7 +101,7 @@ class Products:
         response = {"gender Male Count": active_count, "all_count": len(product_list )}
         return {"response": response, "status": 200}
 
-    def get_dg_product(self, request):
+    def get_dg_product(self, request, auth):
         for i in range(109204, 9000000):
             print(i)
             url = f"https://api.digikala.com/v1/product/{i}/"
