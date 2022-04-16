@@ -1,2 +1,17 @@
-// must have access_level_group
-[]
+[
+  {
+    "_id": "STA10RPREYQSBIFZZA",
+    "_data_storage": "users",
+    "_items": {
+      "first_name": "\u0639\u0644\u06cc",
+      "last_name": "\u062a\u0627\u062c \u0622\u0628\u0627\u062f\u06cc",
+      "user_name": "aliTaj",
+      "phone": "09375908653",
+      "password": "edee29f882543b956620b26d0ee0e7e950399b1c4222f5de05e06425b4c995e9",
+      "signup_status": "signup",
+      "code": 37810,
+      "limit_sms_count": 5,
+      "access_level_group": "user"
+    }
+  }
+]

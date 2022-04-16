@@ -55,7 +55,7 @@ class MyServer(BaseHTTPRequestHandler):
                 request.wfile.write(json.dumps(response).encode(encoding='utf_8'))
             else:
                 # authentication must be here (authCode , class_name, class_function, data_id)
-                auth_code = self.headers.getheader('Authorization')
+                auth_code = self.headers["Authorization"]
                 auth_result = authentication(auth_code, class_name, class_function, data_id)
                 if auth_result == 403:
                     request._set_headers(403)

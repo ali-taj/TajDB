@@ -1,9 +1,10 @@
 import json
 import random
 import string
+import requests
 
 databases_location = 'databases/'
-
+string_time_format = "%Y/%m/%d-%H:%M:%S"
 
 def id_generator(size=18, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
@@ -58,3 +59,16 @@ class DataBaseCTRL:
         DB_file.write(json.dumps(DB_data))
         DB_file.close()
         return data
+
+
+smsPanelUrl = 'http://smspanel.Trez.ir/SendMessageWithUrl.ashx'
+smsPanelUserName = 'Nowian'
+smsPanelPassword = 'A2980580457@'
+smsPanelPhoneNumber = "50002210003000"
+
+adminPhone = '09375908653'
+
+
+def send_sms(message, phone):
+    requests.get('{}?Username={}&Password={}&PhoneNumber={}&MessageBody={}&RecNumber={}&Smsclass=1'
+    .format(smsPanelUrl, smsPanelUserName, smsPanelPassword, smsPanelPhoneNumber,message, phone))
