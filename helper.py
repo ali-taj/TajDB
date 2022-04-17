@@ -6,6 +6,7 @@ import requests
 databases_location = 'databases/'
 string_time_format = "%Y/%m/%d-%H:%M:%S"
 
+
 def id_generator(size=18, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
@@ -61,14 +62,17 @@ class DataBaseCTRL:
         return data
 
 
-smsPanelUrl = 'http://smspanel.Trez.ir/SendMessageWithUrl.ashx'
-smsPanelUserName = 'Nowian'
-smsPanelPassword = 'A2980580457@'
-smsPanelPhoneNumber = "50002210003000"
+setting_file = open(databases_location + "settings.json", 'r')
+setting_json = json.loads(setting_file.read())
+setting_file.close()
 
-adminPhone = '09375908653'
+smsPanelUrl = setting_json["sms_panel_url"]
+smsPanelUserName = setting_json["sms_panel_username"]
+smsPanelPassword = setting_json["sms_panel_password"]
+smsPanelPhoneNumber = setting_json["sms_panel_phone_number"]
+adminPhone = setting_json["admin_phone"]
 
 
 def send_sms(message, phone):
     requests.get('{}?Username={}&Password={}&PhoneNumber={}&MessageBody={}&RecNumber={}&Smsclass=1'
-    .format(smsPanelUrl, smsPanelUserName, smsPanelPassword, smsPanelPhoneNumber,message, phone))
+                 .format(smsPanelUrl, smsPanelUserName, smsPanelPassword, smsPanelPhoneNumber, message, phone))
