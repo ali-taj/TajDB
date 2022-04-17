@@ -57,9 +57,10 @@ class MyServer(BaseHTTPRequestHandler):
                 # authentication must be here (authCode , class_name, class_function, data_id)
                 auth_code = self.headers["Authorization"]
                 auth_result = authentication(auth_code, class_name, class_function, data_id)
+
                 if auth_result == 403:
                     request._set_headers(403)
-                    request.wfile.write(json.dumps(auth_result).encode(encoding='utf_8'))
+                    request.wfile.write(json.dumps({"error": "you don't have permissions for this request!"}).encode(encoding='utf_8'))
                 else:
                     # try:
                     if class_function is not None:

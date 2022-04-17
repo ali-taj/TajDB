@@ -3,7 +3,7 @@ import datetime
 import jwt
 from django.conf import settings
 
-from helper import DataBaseCTRL
+from helper import DataBaseCTRL, string_time_format
 
 
 def authentication(auth_code, class_name, class_function, data_id):
@@ -33,44 +33,41 @@ def authentication(auth_code, class_name, class_function, data_id):
         authCode = "not defined"
 
     if authCode == "not defined":
-        if class_name == "User" and class_function == "signup" or class_function == "login" or class_function == "verify":
-            return True
+        state_1 = class_name.__class__.__name__ == "User" and class_function == "signup" or class_function == "login" or class_function == "verify"
+        state_2 = class_name.__class__.__name__ == "Product" and class_function == "list" or class_function == "get"
+        if state_1 or state_2:
+            return 200
         else:
-            return {"error": "you don't have permissions for this request!"}
+            return 403
     else:
         login_database = DataBaseCTRL("login")
         login_list = login_database.list()
         selected_token = ''
         for dictionary in login_list:
-            if authCode in dictionary.values():
+            if authCode == dictionary["_items"]["access"]["token"]:
                 selected_token = dictionary
         if selected_token != '':
-            try:
-                decoded_token = jwt.decode(
-                    authCode, settings.SECRET_KEY, algorithms='HS256')
-            except jwt.ExpiredSignatureError:
-                return {"response": {"AUTH_FIELD": "authentications field."}, "status": 401}
-            except jwt.InvalidTokenError:
-                return {"response": {"AUTH_FIELD": "authentications field."}, "status": 401}
+
             now_datetime = datetime.datetime.now()
-            token_datetime = datetime.datetime.utcfromtimestamp(
-                decoded_token['exp'])
+            token_datetime = datetime.datetime.strptime(selected_token["_items"]["access"]["exp"],
+                                                        string_time_format)
 
             if token_datetime < now_datetime:
-                return {"response": {"AUTH_FIELD": "authentications field."}, "status": 401}
+                return 403
             else:
-                user_id = decoded_token['user_id']
+                user_id = selected_token["_items"]['user_id']
                 users_list = DataBaseCTRL("users").list()
+
                 for user in users_list:
                     if user_id == user["_id"]:
                         selected_user = user
-                permissions_list = DataBaseCTRL("permissions")
-                for permission in permissions_list:
-                    if selected_user["access_level_group"] == permission["name"]:
-                        selected_permission = permission
 
+                permissions_list = DataBaseCTRL("permissions").list()
+                for permission in permissions_list:
+                    if selected_user["_items"]["access_level_group"] == permission["name"]:
+                        selected_permission = permission
                 if selected_permission["name"] == "admin":
-                    return "True"
+                    return 200
                 else:
                     auth_403 = 0
                     auth = 403
@@ -93,10 +90,10 @@ def authentication(auth_code, class_name, class_function, data_id):
                     if auth_403 > 0:
                         auth = 403 if auth_403 == len(selected_permission['urls']) else 200
                     if auth == 403:
-                        return {"error": "you don't have permissions for this request!"}
+                        return 403
                     elif auth == 200:
-                        return "True"
+                        return 200
                     else:
                         return auth
         else:
-            return {"error": "auth failed"}
+            return 403

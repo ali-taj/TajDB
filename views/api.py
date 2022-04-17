@@ -84,7 +84,7 @@ class DataBase:
         return {"response": response, "status": 200}
 
 
-class Products:
+class DKProducts:
 
     def __init__(self):
         self.products_db = DataBaseCTRL('products')

@@ -11,7 +11,7 @@
       "signup_status": "signup",
       "code": 37810,
       "limit_sms_count": 5,
-      "access_level_group": "user"
+      "access_level_group": "admin"
     }
   }
 ]

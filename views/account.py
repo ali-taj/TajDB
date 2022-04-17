@@ -124,19 +124,26 @@ class User:
                         if request_data["password"] == user["_items"]["password"]:
 
                             access_token = {
-                                'user_id': user["_id"],
                                 'exp': (datetime.datetime.now() + datetime.timedelta(days=0, minutes=15)).strftime(string_time_format),
                                 'token': ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(64))
                             }
                             refresh_token = {
-                                'user_id': user["_id"],
                                 'exp': (datetime.datetime.now() + datetime.timedelta(days=30)).strftime(string_time_format),
                                 'token': ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(64))
                             }
-                            login_db = DataBaseCTRL("login")
-                            login_data = {"access": access_token, "refresh": refresh_token}
-                            prepared_data_for_save = config_data(data_storage="login", data=login_data)
-                            login_status = login_db.append(prepared_data_for_save)
+
+                            login_database = DataBaseCTRL("login")
+                            login_list = login_database.list()
+                            new_login = True
+                            for dictionary in login_list:
+                                if user["_id"] == dictionary["_items"]["user_id"]:
+                                    new_login = False
+                                    data = {"access": access_token, "refresh": refresh_token}
+                                    login_status = login_database.update(data=data, id=dictionary["_id"])
+                            if new_login:
+                                login_data = {'user_id': user["_id"], "access": access_token, "refresh": refresh_token}
+                                prepared_data_for_save = config_data(data_storage="login", data=login_data)
+                                login_status = login_database.append(prepared_data_for_save)
                             response_login = {"access": login_status["_items"]["access"]["token"],
                                               "refresh": login_status["_items"]["refresh"]["token"]}
                             return {"response": response_login,
@@ -155,40 +162,33 @@ class User:
             response = {"error": f"Content-Type {request.headers['Content-Type']} not allowed!"}
             return {"response": response, "status": 400}
 
-    def get(self, request, auth):
-        male_count = 0
-        customer_list = self.users_db.list()
-        for data in customer_list:
-            if "gender" in data:
-                if data["gender"] == "Male":
-                    male_count += 1
-        response = {"gender Male Count": male_count, "all_count": len(customer_list)}
-        return {"response": response, "status": 200}
+    def current_user(self, request, auth):
+        if auth != 200:
+            query = auth
+        auth_code = request.headers["Authorization"].split(" ")[1]
+        login_database = DataBaseCTRL("login")
+        login_list = login_database.list()
+        for dictionary in login_list:
+            if auth_code == dictionary["_items"]["access"]["token"]:
+                selected_token = dictionary
 
-    def create(self, request, auth):
-        if request.headers['Content-Type'] == "application/json":
-            data_string = request.rfile.read(int(request.headers['Content-Length']))
-            request_data = json.loads(data_string)
-            prepared_data_for_save = config_data(data_storage="customers", data=request_data)
-            response = self.users_db.append(data=prepared_data_for_save)
-            return {"response": response, "status": 201}
-        else:
-            response = {"error": f"Content-Type {request.headers['Content-Type']} not allowed!"}
-            return {"response": response, "status": 400}
+        user_id = selected_token["_items"]['user_id']
+        users_list = DataBaseCTRL("users").list()
+        for user in users_list:
+            if user_id == user["_id"]:
+                selected_user = user
 
-    def update(self, request, id, auth):
-        if request.headers['Content-Type'] == "application/json":
-            data_string = request.rfile.read(int(request.headers['Content-Length']))
-            request_data = json.loads(data_string)
-            response = self.users_db.update(data=request_data, id=id)
-            return {"response": response, "status": 201}
-        else:
-            response = {"error": f"Content-Type {request.headers['Content-Type']} not allowed!"}
-            return {"response": response, "status": 400}
+        del selected_user["_data_storage"]
+        del selected_user["_items"]["password"]
+        del selected_user["_items"]["code"]
+        del selected_user["_items"]["limit_sms_count"]
+        return {"response": selected_user, "status": 200}
 
     def delete(self, request, id, auth):
         response = self.users_db.remove(id)
         return {"response": response, "status": 200}
 
     def list(self, request, auth):
+        if auth != 200:
+            query = auth
         return {"response": self.users_db.list(), "status": 200}
