@@ -1,14 +1,20 @@
+import base64
 import json
 import random
 import string
 import requests
+import time
 
 databases_location = 'databases/'
 string_time_format = "%Y/%m/%d-%H:%M:%S"
 
 
-def id_generator(size=18, chars=string.ascii_uppercase + string.digits):
-    return ''.join(random.choice(chars) for _ in range(size))
+def id_generator(size=4, chars=string.ascii_uppercase + string.digits):
+    code = ''.join(random.choice(chars) for _ in range(size))
+    code += '_'
+    timestamp = str(base64.b64encode(bytes(str(time.time()), 'utf-8'))).replace("b", "").replace("'", "")
+    code += timestamp
+    return code
 
 
 def config_data(**kwargs):

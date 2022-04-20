@@ -1,15 +1,10 @@
 import json
-import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from os import curdir, sep
-from mimetypes import types_map
-from time import sleep
 
 from urls import valid_urls
 # import socketserver
-import codecs
 
-from views.base import authentication
+from authentication import authentication
 
 hostName = "127.0.0.1"
 serverPort = 8080

@@ -15,6 +15,13 @@ class Product:
         if request.headers['Content-Type'] == "application/json":
             data_string = request.rfile.read(int(request.headers['Content-Length']))
             request_data = json.loads(data_string)
+            required_fields = ['name', 'description', 'summary', 'types']
+            image_fields = ['image']
+            for field in required_fields:
+                if field not in request_data:
+                    return {"response": {"BAD_REQUEST": f"field {field} does not exist in request data."},
+                            "status": 400}
+
             return {"response": {"add": request_data}, "status": 200}
         else:
             response = {"error": f"Content-Type {request.headers['Content-Type']} not allowed!"}
