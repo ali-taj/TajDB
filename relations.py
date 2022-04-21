@@ -1,25 +1,20 @@
-def pagination():
-    size = 50
-
-    pages = 200 // size
-    if 200 % size > 0:
-        pages += 1
+from helper import DataBaseCTRL
 
 
 def relation_controller(**kwargs):
     # relation_document = {
-    #     "target_index": ,
+    #     "target_database": ,
     #     "target_field": ,  # "field1.object.object"
     #     "target_id": ,
-    #     "base_index": ,
+    #     "base_database": ,
     #     "base_id":  # ["field1", "field2.object"]
     # }
+
+    selected_document = DataBaseCTRL(kwargs["target_database"]).get_by_id(kwargs["target_id"])
 
     target_field_list = kwargs['target_field'].split(".")
     field_object_index = 0
     all_fields_index = ""
-
-    selected_document = selected_elastic.get(index=kwargs["target_index"], id=kwargs["target_id"])["_source"]
 
     for field_object in target_field_list:
 
@@ -33,35 +28,20 @@ def relation_controller(**kwargs):
             all_fields_index += "['" + field_object + "']"
         field_object_index += 1
 
-    if kwargs["base_index"] == "dataset":
-        base_data = []
-        for base_id in kwargs["base_id"]:
-            base_index_fields = {"id": base_id,
-                                 "relation_index": kwargs["base_index"],
-                                 "labels": kwargs["base_id"][base_id]}
-            base_data.append(base_index_fields)
-
-    else:
-        base_data = []
-        for base_id in kwargs["base_id"]:
-            base_index_fields = {"id": base_id,
-                                 "relation_index": kwargs["base_index"]}
-            base_data.append(base_index_fields)
+    base_data = []
+    for base_id in kwargs["base_id"]:
+        base_database_fields = {"id": base_id,
+                                "relation_index": kwargs["base_database"]}
+        base_data.append(base_database_fields)
     exec('selected_document' + all_fields_index + '=base_data')
-    update_data_to_target = selected_elastic.index(index=kwargs["target_index"], id=kwargs["target_id"],
-                                                   document=selected_document)
+    update_data_to_target = DataBaseCTRL(kwargs["target_database"]).update(data=selected_document,
+                                                                           id=kwargs["target_id"])
 
     return update_data_to_target
 
 
 def append_data(data):
-    document = target_elasticsearch.get(index=data["relation_index"], id=data["id"])
-    del document["_index"]
-    del document["found"]
-    del document["_seq_no"]
-    del document["_primary_term"]
-    del document["_version"]
-
+    document = DataBaseCTRL(data["relation_index"]).get_by_id(data["id"])
     return document
 
 

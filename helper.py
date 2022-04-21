@@ -27,6 +27,16 @@ class DataBaseCTRL:
         self.name = db_name
         self.location = databases_location + self.name + ".json"
 
+    def get_by_id(self, id):
+        DB_data_file = open(f"{databases_location}{self.name}.json", 'r')
+        DB_data = json.loads(DB_data_file.read())
+        response_data = {"NOT_FOUNT": f"{self.name} with id {id} not found!"}
+        for i in range(len(DB_data)):
+            if id == DB_data[i]["_id"]:
+                response_data = DB_data[i]
+
+        return response_data
+
     def list(self):
         file = open(self.location, 'r')
         response_file = json.loads(file.read())
