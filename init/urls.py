@@ -1,10 +1,11 @@
 from views.api import *
 from views.account import *
 from views.products import Product
+from views.site_config import Main
 
 valid_urls = {
     "database_list": DataBase,
-    # "main": Main,
+    "main": Main,
     # "file_manager": FileManager,
     # "dashboard": Dashboard,
     # "comment": Comment,
