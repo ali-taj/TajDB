@@ -1,10 +1,10 @@
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-from urls import valid_urls
+from init.urls import valid_urls
 # import socketserver
 
-from authentication import authentication
+from init.authentication import authentication
 
 hostName = "127.0.0.1"
 serverPort = 8080

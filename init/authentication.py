@@ -1,8 +1,4 @@
 import datetime
-
-import jwt
-from django.conf import settings
-
 from helper import DataBaseCTRL, string_time_format
 
 
