@@ -10,6 +10,8 @@ class Main:
         if request.headers['Content-Type'] == "application/json":
             data_string = request.rfile.read(int(request.headers['Content-Length']))
             request_data = json.loads(data_string)
+            # slide: list (urls) , about: html, logo: list (urls) , namad: list, banner: url (random select)
+            # contact us page text: text, roles: list (text), site_name: text, site_slogan: text
             required_fields = ['name', 'description', 'summary', 'types']
             image_fields = ['image']
             for field in required_fields:
@@ -33,3 +35,11 @@ class Main:
         if auth != 200:
             query = auth
         return {"response": self.users_db.list()[1], "status": 200}
+
+
+class Category:
+    def __init__(self):
+        self.users_db = DataBaseCTRL('categories')
+
+    def get(self):
+        pass
